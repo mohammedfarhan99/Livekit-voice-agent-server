@@ -97,10 +97,12 @@ async def entrypoint(ctx: JobContext):
             
             # Text-to-Speech
             tts=elevenlabs.TTS(
-                voice=voice_name,
+                # voice=voice_name,
                 model="eleven_turbo_v2_5",
-                stability=voice_settings.get("stability", 0.8),
-                similarity_boost=voice_settings.get("similarity", 0.9)
+                api_key=os.getenv("ELEVENLABS_API_KEY")
+                # settings
+                # stability=voice_settings.get("stability", 0.8),
+                # similarity_boost=voice_settings.get("similarity", 0.9)
             )
         )
         
