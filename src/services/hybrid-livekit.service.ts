@@ -25,7 +25,7 @@ export class HybridLiveKitService {
 
   private async ensurePythonWorker() {
     if (this.pythonWorkerStarted) return;
-      
+
     try {
       logger.info('Starting Python agent workers...');
       
@@ -154,14 +154,18 @@ export class HybridLiveKitService {
   /**
    * Get room information
    */
-  getRoomInfo(roomName: string): RoomInfo | undefined {
-    return this.activeRooms.get(roomName);
+  async getRoomInfo(roomName: string): Promise<RoomInfo | undefined> {
+    const room = await this.roomService.listRooms([roomName]);
+    const room_name = room.at(0)?.name;
+    if(!room_name) return undefined;
+    return this.activeRooms.get(room_name);
   }
 
   /**
    * List all active rooms
    */
   getActiveRooms(): RoomInfo[] {
+    const rooms = this.roomService.listRooms()
     return Array.from(this.activeRooms.values());
   }
 

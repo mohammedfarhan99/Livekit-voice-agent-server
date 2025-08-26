@@ -107,6 +107,8 @@ const AGENT_TYPE_DEFINITIONS = {
  */
 router.post('/create', async (req, res) => {
   try {
+    
+    
     const validatedData = createAgentSchema.parse(req.body);
     
     logger.info(`Creating ${validatedData.agentType} agent`, { 
@@ -250,7 +252,7 @@ router.get('/rooms', (req, res) => {
 router.get('/rooms/:roomName', async (req, res) => {
   try {
     const { roomName } = req.params;
-    const roomInfo = liveKitService.getRoomInfo(roomName);
+    const roomInfo = await  liveKitService.getRoomInfo(roomName);
     
     if (!roomInfo) {
       return res.status(404).json({
@@ -301,6 +303,8 @@ router.get('/rooms/:roomName', async (req, res) => {
         is_active: roomInfo.status === 'active' && participants.length > 0
       }
     };
+
+    
     
     res.json({
       success: true,
@@ -322,7 +326,7 @@ router.get('/rooms/:roomName', async (req, res) => {
 router.delete('/rooms/:roomName', async (req, res) => {
   try {
     const { roomName } = req.params;
-    const roomInfo = liveKitService.getRoomInfo(roomName);
+    const roomInfo = await liveKitService.getRoomInfo(roomName);
     
     if (!roomInfo) {
       return res.status(404).json({
@@ -372,7 +376,7 @@ router.get('/rooms/:roomName/participants', async (req, res) => {
     const { roomName } = req.params;
     
     // Check if room exists
-    const roomInfo = liveKitService.getRoomInfo(roomName);
+    const roomInfo = await liveKitService.getRoomInfo(roomName);
     if (!roomInfo) {
       return res.status(404).json({
         success: false,
