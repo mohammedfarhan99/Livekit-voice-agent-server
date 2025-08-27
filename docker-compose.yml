@@ -1,0 +1,45 @@
+services:
+  server:
+    build: 
+     dockerfile:  Dockerfile
+     context: .
+    container_name: livekit-voice-agent-server
+    command: ["sh", "-c", "cd python-agents && venv/bin/python workers/main.py start & npm run dev"]
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    # networks:
+    #   - livekit-dev
+    volumes:
+      - ./:/app
+
+  ## LiveKit Server
+  livekit-server:
+    # image: livekit/livekit-server:v1.5.2
+    image: livekit/livekit-server:v1.9
+    ports:
+      - "7880:7880"      # HTTP API & WebSocket
+      - "7881:7881"      # TCP for media
+      - "7882:7882/udp"  # UDP for media
+      - "3478:3478/udp"  # STUN
+    # environment:
+    #   - LIVEKIT_LOG_LEVEL=debug
+    #   - LIVEKIT_KEYS="devkey\:devsecret"
+    env_file:
+      - .env
+    # command: ["livekit-server", "--dev"]
+    volumes:
+      # - ./livekit-dev.yaml:/etc/livekit.yaml
+      - ./livekit-dev.yaml:/livekit.yaml
+    entrypoint: "/livekit-server --config /livekit.yaml"
+    restart: unless-stopped
+    # networks:
+    #   - livekit-dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7880"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
